@@ -81,20 +81,35 @@ int main(int argc, char *argv[])
 		printf("Connexión acceptada del client: adreça %s, port %d\n",	inet_ntoa(clientAddr.sin_addr), ntohs(clientAddr.sin_port));
 
 		/*Rebre*/
-		result = read(newFd, buffer, 1024);
-		printf("Missatge rebut del client(bytes %d): %s\n",	result, buffer);
-		
-		//char inici_trama;
-        //esult = read(newFd, buffer, 1);
-        if ((result == 2) && (buffer[0] == 'A')) {
-            //char comanda;
-            //result = read(newFd, &comanda, 2);
-           // if (result == 2) {
-                switch (buffer[1]) {
-                case 'M':
-                    printf("cosa");
+        char itrama;
+        result = read(newFd, &itrama, 1); 
+        if ((result == 1) && (itrama == '{')) { //si result es 1(no està buit) i  el primer caracter de la trama és "{"
+            char comanda;
+            result = read(newFd, &comanda, 1);
+            if (result == 1) {
+                switch (comanda) {
+				case 'M':
+					marxastop(newFd);
+                case 'U':
+                    mitjana(newFd);
                     break;
-				}
+                case 'X':
+                    maxim(newFd);
+                    break;
+                case 'Y':
+                    minim(newFd);
+                    break;
+                case 'R':
+                    resetmax(newFd);
+                    break;
+                case 'B':
+                    icomptador(newFd);
+                    break;     
+                default:
+                    fprintf(stderr, "comanda incorrecte: comanda='%c'\n", comanda);
+                    break;
+			
+				
 			}
           }
 		
@@ -105,7 +120,42 @@ int main(int argc, char *argv[])
 
 		/*Tancar el socket fill*/
 		result = close(newFd);
+		}
 	}
 }
 
+
+
+void marxastop(int newFd) {
+	result = read(newFd, &comanda, 2);
+	if (comanda==0){
+	marxastop=0
+	}
+	
+}
+void mitjana(int newFd) {
+	
+
+	
+}
+void maxim(int newFd) {
+	
+
+	
+}
+void minim(int newFd) {
+	
+
+	
+}
+void resetmax(int newFd) {
+	
+
+	
+}
+void icomptador(int newFd) {
+	
+
+	
+}
 
