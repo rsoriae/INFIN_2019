@@ -37,12 +37,13 @@ void ImprimirMenu(void)
 {
 	printf("\n\nMenu:\n\n");
 
-	printf("1: Temperatura mitja\n");
+	printf("m: Marxa o parada de l'adquisició\n");
+	printf("1: Ultima temperatura mitja\n");
 	printf("2: Temperatura màxima\n");
 	printf("3: Temperatura mínima\n");
 	printf("4: Reset màxim i mínim\n");
 	printf("5: Comptador\n");
-	printf("m: Marxa o parada de l'adquisició\n");
+
 	printf("s: Sortir\n");
 
 }
@@ -87,7 +88,7 @@ int 		result;
 	 
 
 	/*Rebre*/
-	memset(buffer,'\0',10);  
+	//memset(buffer,'\0',10);  
 	result = read(sFd, buffer, 10);
 	printf("Missatge rebut del servidor(bytes %d): %s\n",	result, buffer);	
 
@@ -112,32 +113,32 @@ int main(int argc, char **argv)
 		{
 			/*Case marxa*/
 			case 'm':
-				printf("Introdueix 1 marxa o 2 parada\n");
+				printf("Introdueix marxa (1) o parada (0)\n");
 				valor2: scanf("%i",&marxa);
 				
 					if (marxa==1)
 						{
-						printf("Si us plau, introdueix el temps de mostreig, màxim 20 segons\n");
+						printf("Introdueix el temps de mostreig, màxim 20 segons\n");
 						valor1: scanf("%i",&temps);
 						
 						if (temps<0 || temps>20)
 							{
-							printf("Error, si us plau, introdueix un valor entre 0 i 20\n");
+							printf("Error, introdueix un valor entre 0 i 20\n");
 							goto valor1;
 							}
 						
-						printf("Si us plau, introdueix el número de mostres, màxim 9 mostres\n");
+						printf("Introdueix el número de mostres, màxim 9 mostres\n");
 						valor: scanf("%i",&mostres);
 						if (mostres<0 || mostres>9)
 							{
-							printf("Error, si us plau, introdueix un valor entre 0 i 9\n");
+							printf("Error, introdueix un valor entre 0 i 9\n");
 							goto valor;
 							}
-						sprintf(missatge,"{M1%02i%i}",temps,mostres);
-						printf("%s",missatge);	
+						sprintf(missatge,"{M1%02i%i}",temps,mostres);      //el 02 introdueix un 0 en cas <10 
+ 						printf("%s",missatge);	
 						conectar(); 	
 						}
-					else if (marxa==2)
+					else if (marxa==0)
 						{
 										
 						sprintf(missatge,"{M0}");	
@@ -145,7 +146,7 @@ int main(int argc, char **argv)
 						}
 					else
 						{
-						printf("Valor equivocat, si us plau, introdueix 1 marxa o 2 parada\n");
+						printf("Valor equivocat, introdueix 1 marxa o 2 parada\n");
 						goto valor2;
 						}
 				ImprimirMenu();		                            
@@ -160,22 +161,26 @@ int main(int argc, char **argv)
 			
 			/*Case temepratura mitja*/
 			case '1':
-				printf("Heu seleccionat temperatura mitja\n");	
+				printf("Temperatura mitja seleccionada\n");	
 				sprintf(missatge,"{U}");
 				conectar();
 				
-				numero = ((buffer[3]-'0')*10+(buffer[4]-'0')+(buffer[6]-'0')*0.1+(buffer[7]-'0')*0.01);
-				printf("La temperatura mitja és de %.02fºC\n", numero); 
+				//numero = ((buffer[3]-'0')*10+(buffer[4]-'0')*1+(buffer[6]-'0')*0.1+(buffer[7]-'0')*0.01);
+				
+				numero = ((buffer[3]-'0')+(buffer[4]-'0')+(buffer[6]-'0')+(buffer[7]-'0'));         // el -0 converteix ascii en real
+				printf("L'última temperatura mitja és de %.02fºC\n", numero); 
 				ImprimirMenu();                      
 				break;
 				
 				
 			/*Case temperatura màxima*/
 			case '2':
-				printf("Heu seleccionat temperatura màxima\n");
+				printf("Temperatura màxima seleccionada\n");
 				sprintf(missatge,"{X}");
 				conectar();
-				numero= ((buffer[3]-'0')*10+(buffer[4]-'0')+(buffer[6]-'0')*0.1+(buffer[7]-'0')*0.01);
+				//numero= ((buffer[3]-'0')*10+(buffer[4]-'0')+(buffer[6]-'0')*0.1+(buffer[7]-'0')*0.01);
+				
+				numero= ((buffer[3])+(buffer[4])+(buffer[6])+(buffer[7]));
 				printf("La temperatura màxima és de %.02fºC\n", numero);  
 				ImprimirMenu();                             
 				break;
@@ -183,13 +188,49 @@ int main(int argc, char **argv)
 				
 			/*Case temperatura mínima*/
 			case '3':
-				printf("Heu seleccionat temperatura mínima\n");	
+				printf("Temperatura mínima seleccionada\n");	
 				sprintf(missatge,"{Y}");
 				conectar();
-				numero = ((buffer[3]-'0')*10+(buffer[4]-'0')+(buffer[6]-'0')*0.1+(buffer[7]-'0')*0.01);
+				//numero = ((buffer[3]-'0')*10+(buffer[4]-'0')+(buffer[6]-'0')*0.1+(buffer[7]-'0')*0.01);
+				
+				numero = ((buffer[3])+(buffer[4])+(buffer[6])+(buffer[7]));
 				printf("La temperatura mínima és de %.02fºC\n", numero);
 				ImprimirMenu();                             
 				break;
+			
+		/*Case reset màxim i mínim*/
+			case '4':
+				printf("Reset màxim i mínim seleccionat\n");
+				sprintf(missatge,"{R}");
+				conectar();  
+				if (strcmp(buffer,"{R0}")==0)
+				{
+					printf("El màxim i el mínim s'han resetejat\n"); 	
+				}
+				else
+				{
+					printf("Error en el reset\n"); 		
+				}
+				ImprimirMenu();
+				break;
+			
+			
+			/*Case comptador*/
+			case '5':
+				printf("Comptador seleccionat\n");
+				sprintf(missatge,"{B}");	
+				conectar(); 
+				
+				// 	numero = ((buffer[3]-'0')*1000+(buffer[4]-'0')*100+(buffer[5]-'0')*10+(buffer[6]-'0'));
+				
+				numero = ((buffer[3])+(buffer[4])+(buffer[5])+(buffer[6]));
+				printf("El comptador és %1f\n", numero);
+				 	 
+				ImprimirMenu();                   
+				break;
+			
+			
+			
 			
 			
 			input = getchar();
