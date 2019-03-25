@@ -158,8 +158,42 @@ int main(int argc, char **argv)
 				
 			
 			
+			/*Case temepratura mitja*/
+			case '1':
+				printf("Heu seleccionat temperatura mitja\n");	
+				sprintf(missatge,"{U}");
+				conectar();
+				
+				numero = ((buffer[3]-'0')*10+(buffer[4]-'0')+(buffer[6]-'0')*0.1+(buffer[7]-'0')*0.01);
+				printf("La temperatura mitja és de %.02fºC\n", numero); 
+				ImprimirMenu();                      
+				break;
+				
+				
+			/*Case temperatura màxima*/
+			case '2':
+				printf("Heu seleccionat temperatura màxima\n");
+				sprintf(missatge,"{X}");
+				conectar();
+				numero= ((buffer[3]-'0')*10+(buffer[4]-'0')+(buffer[6]-'0')*0.1+(buffer[7]-'0')*0.01);
+				printf("La temperatura màxima és de %.02fºC\n", numero);  
+				ImprimirMenu();                             
+				break;
+				
+				
+			/*Case temperatura mínima*/
+			case '3':
+				printf("Heu seleccionat temperatura mínima\n");	
+				sprintf(missatge,"{Y}");
+				conectar();
+				numero = ((buffer[3]-'0')*10+(buffer[4]-'0')+(buffer[6]-'0')*0.1+(buffer[7]-'0')*0.01);
+				printf("La temperatura mínima és de %.02fºC\n", numero);
+				ImprimirMenu();                             
+				break;
+			
 			
 			input = getchar();
+			
 
 	}
 	
