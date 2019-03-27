@@ -88,7 +88,7 @@ int 		result;
 	 
 
 	/*Rebre*/
-	//memset(buffer,'\0',10);  
+	 
 	result = read(sFd, buffer, 10);
 	printf("Missatge rebut del servidor(bytes %d): %s\n",	result, buffer);	
 
@@ -98,19 +98,24 @@ int 		result;
 	
 }
 int main(int argc, char **argv)
-{      
-	                                                       
+      
+{	                                                       
      /*Declaració de variables*/                                                               
 	char input;
 	
-	/*Trucada al void per mostrar el menú en pantalla*/
-	ImprimirMenu();                             
-	input = getchar();
-	/*Bucle per mantenir el programa en continu funcionament i segons la selecció del menú*/
-	while (input != 's')
-	{
-		switch (input)
-		{
+	/*Void per mostrar el menú en pantalla*/
+	
+	/*Bucle per mantenir el programa en continu funcionament*/
+
+	do {
+
+		ImprimirMenu();                             
+		input = getchar();
+		printf("Opcio seleccionada:(%c)\n", input );
+
+		
+		switch (input){
+			
 			/*Case marxa*/
 			case 'm':
 				printf("Introdueix marxa (1) o parada (0)\n");
@@ -146,56 +151,55 @@ int main(int argc, char **argv)
 						}
 					else
 						{
-						printf("Valor equivocat, introdueix 1 marxa o 2 parada\n");
+						printf("Valor equivocat, introdueix (1) marxa o (0) parada\n");
 						goto valor2;
 						}
-				ImprimirMenu();		                            
+				//ImprimirMenu();		                            
 				break;
+				
 			case 0x0a: //Això és per enviar els 0x0a (line feed) que s'envia quan li donem al Enter
 				break;
+				
 			default:
 				printf("Opció incorrecta\n");	
+				
 				break;
 				
 			
 			
-			/*Case temepratura mitja*/
+		/*Case temepratura mitja*/
 			case '1':
 				printf("Temperatura mitja seleccionada\n");	
 				sprintf(missatge,"{U}");
 				conectar();
 				
-				//numero = ((buffer[3]-'0')*10+(buffer[4]-'0')*1+(buffer[6]-'0')*0.1+(buffer[7]-'0')*0.01);
-				
 				numero = ((buffer[3]-'0')+(buffer[4]-'0')+(buffer[6]-'0')+(buffer[7]-'0'));         // el -0 converteix ascii en real
 				printf("L'última temperatura mitja és de %.02fºC\n", numero); 
-				ImprimirMenu();                      
+				//ImprimirMenu();                      
 				break;
 				
 				
-			/*Case temperatura màxima*/
+		/*Case temperatura màxima*/
 			case '2':
 				printf("Temperatura màxima seleccionada\n");
 				sprintf(missatge,"{X}");
 				conectar();
-				//numero= ((buffer[3]-'0')*10+(buffer[4]-'0')+(buffer[6]-'0')*0.1+(buffer[7]-'0')*0.01);
 				
 				numero= ((buffer[3])+(buffer[4])+(buffer[6])+(buffer[7]));
 				printf("La temperatura màxima és de %.02fºC\n", numero);  
-				ImprimirMenu();                             
+				//ImprimirMenu();                             
 				break;
 				
 				
-			/*Case temperatura mínima*/
+		/*Case temperatura mínima*/
 			case '3':
 				printf("Temperatura mínima seleccionada\n");	
 				sprintf(missatge,"{Y}");
 				conectar();
-				//numero = ((buffer[3]-'0')*10+(buffer[4]-'0')+(buffer[6]-'0')*0.1+(buffer[7]-'0')*0.01);
-				
+			
 				numero = ((buffer[3])+(buffer[4])+(buffer[6])+(buffer[7]));
 				printf("La temperatura mínima és de %.02fºC\n", numero);
-				ImprimirMenu();                             
+				//ImprimirMenu();                             
 				break;
 			
 		/*Case reset màxim i mínim*/
@@ -211,36 +215,35 @@ int main(int argc, char **argv)
 				{
 					printf("Error en el reset\n"); 		
 				}
-				ImprimirMenu();
+				//ImprimirMenu();
 				break;
 			
 			
-			/*Case comptador*/
+		/*Case comptador*/
 			case '5':
 				printf("Comptador seleccionat\n");
 				sprintf(missatge,"{B}");	
 				conectar(); 
 				
-				// 	numero = ((buffer[3]-'0')*1000+(buffer[4]-'0')*100+(buffer[5]-'0')*10+(buffer[6]-'0'));
-				
 				numero = ((buffer[3])+(buffer[4])+(buffer[5])+(buffer[6]));
 				printf("El comptador és %1f\n", numero);
 				 	 
-				ImprimirMenu();                   
+				//ImprimirMenu();                   
 				break;
 			
+						
 			
-			
-			
-			
-			input = getchar();
-			
-
-	}
 	
+	}  //switch
+	   
+
+	
+}	while (input != 's');
+
+	printf("Acaba\n");
+
+       return 0;	
 
 
-
-	return 0;
-}			}
-			
+}//main
+		
