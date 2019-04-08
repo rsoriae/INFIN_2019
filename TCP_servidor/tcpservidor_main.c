@@ -314,7 +314,7 @@ void marxastop(int newFd) {
     }
 
     /* enviar resposta */
-    result = write (newFd, &resposta, strlen(resposta));
+    result = write (newFd, resposta, strlen(resposta));
     if (result != strlen(resposta)) {
         perror("marxastop(write)\n");
         
@@ -341,7 +341,7 @@ void mitjana(int newFd) {
     }
 
     /* enviar resposta */
-    result = write (newFd, &resposta, strlen(resposta));
+    result = write (newFd, resposta, strlen(resposta));
     if (result != strlen(resposta)) {
         perror("mitjana(write)\n");
     }
