@@ -5,9 +5,28 @@ int comptador=0;
 float mytemp[10];
 int i=0;
 int parat=1;
+String data;
+String data1;
+int mostres;
+int tempsd;
+int tempsu;
+int tempsentre;
+int sortidau;
+int sortidad;
+int sortida;
+int entradau;
+int entradad;
+int entrada;
+int valorentrada;
 
 
 
+
+//respostes
+String msgM="AMEZ";
+String msgC="ACE0000Z";
+String msgS="ASEZ";
+String msgE="AE0EZ";
 
 
 void setup()
@@ -124,7 +143,170 @@ void adquisicio() {
 
 // VOID QUE S'EXECUTA SI ESTEM EN EL CAS 0 DE PARADA
 void parada() {
-  
+
+      //comprovació de la funció Marxa
+      if((data[0]=='A')&&(data[1]=='M')&&(data[2]=='1')&&(data[6]=='Z')){
+        
+        //concersió del número de string (ASCII) a enter
+        tempsd=data[3]-48;
+        tempsu=data[4]-48;
+        
+        //conversió a número enter de 2 dígits
+        temps=tempsd*10+tempsu; 
+        mostres=data[5]-48;
+        
+        //temps entre mostres en segon
+        tempsentre=temps*1000;
+
+        //Comprovació del si el temps supera els 20 segons o les mostres són superiors a 9
+        if((temps <= 20)&&(temps > 0)&&(mostres <= 9)&&(mostres > 0)){
+          
+         //Igualació per evitar mostrar continuament el missatge introduït
+          data1=data;
+          
+          //Canvi de número a caràcter ASCII, sumant 48 (valor 0 en ASCII)
+          msgM[2]=0+'0';
+          
+          //Missatga de codi correcte, el temps i les mostres.
+          Serial.println("");
+          Serial.println(data);
+          Serial.println("");
+          Serial.println(msgM);
+          Serial.println("");
+          Serial.print("TEMPS: ");
+          Serial.println(temps);
+          Serial.print("MOSTRES: ");
+          Serial.println(mostres);
+          Serial.println("");
+          
+          //es manté en situació marxa
+          opcio=1;
+        }
+
+         else{
+           
+        //en cas contrari, s'envia un 2, error de paràmetres
+          msgM[2]=2+'0';
+          Serial.println("");
+          Serial.println(msgM);
+         }
+      }
+
+      //Comprovació d'error de protocol
+      if((data[0]=='A') && (data[1]=='M') && (data[6]!='Z')){
+     
+          msgM[2]=1+'0';
+          Serial.println("");
+          Serial.println(msgM);
+
+     }
+
+
+     //Conversió analógic digital
+      if((data[0]=='A') && (data[1]=='C') && (data[2]!='Z')){
+          
+          //Mostrar per pantalla error de protocol
+          msgC[2]=1+'0';
+                    
+          Serial.println("");
+          Serial.println(msgC);
+      }
+
+
+      //Comprovació comanda Sortida digital
+      if((data[0]=='A') && (data[1]=='S') && (data[5]=='Z')){
+
+        Serial.println("");
+        Serial.println(data);
+        
+       //Conversió en números enters
+        sortidad=data[2]-48;
+        sortidau=data[3]-48;
+        sortida=sortidad*10+sortidau;
+        
+        //comprovació del nº de pin de sortida dins del rang de l'arduino i que s'activi o es desactivi (1 o 0)
+          if((sortida <= 13) && ((data[4]=='1')||(data[4]=='0'))){
+            
+              //Mode pin activat
+              if(data[4]=='1'){
+                
+              //Activació sortida i declaració de sortida com la variable "sortida"
+                pinMode(sortida,OUTPUT);
+                digitalWrite(sortida,HIGH);
+                
+              //Mostra per pantalla codi correcte
+                msgS[2]=0+'0';
+                Serial.println("");
+                Serial.println(msgS);
+              }
+              //Mode pin desactivat
+              if(data[4]=='0'){
+                
+              //Desactivació sortida i declaració de sortida com la variable "sortida"
+                pinMode(sortida,OUTPUT);
+                digitalWrite(sortida,LOW);
+              //Mostrar per pantalla codi correcte
+                msgS[2]=0+'0';
+                Serial.println("");
+                Serial.println(msgS);
+              }           
+            }
+            else{
+            //Mostrar error de paràmetres
+              msgS[2]=2+'0';
+              Serial.println("");
+              Serial.println(msgS);
+            }
+            
+        }
+
+
+        //Comprovació d'error de protocol Sortides
+      if((data[0]=='A') && (data[1]=='S') && (data[5]!='Z')){
+
+          
+          msgS[2]=1+'0';
+         
+          Serial.println("");
+          Serial.println(msgS);
+      }
+
+      //Comprovació Codi entrades, mateix funcionament que el codi de sortides
+      if((data[0]=='A') && (data[1]=='E') && (data[4]=='Z')){
+        
+        Serial.println("");
+        Serial.println(data);
+        
+        entradad=data[2]-48;
+        entradau=data[3]-48;
+        entrada=entradad*10+entradau;
+
+        if(entrada <= 13){
+          
+        //Mode pullup per evitar rebots
+        pinMode(entrada,INPUT_PULLUP);
+        
+        //Lectura del valor de l'entrada
+        valorentrada= digitalRead(entrada);
+        //Mostra del valor de lectura
+        Serial.println("");
+        Serial.println(valorentrada);
+        
+        msgE[3]=valorentrada+'0';
+        Serial.println("");
+        Serial.println(msgE);
+        }
+      }
+
+
+      //Comprovació error de protocol d'entrades
+      if((data[0]=='A') && (data[1]=='E') && (data[4]!='Z')){
+
+          msgE[2]=1+'0';
+          msgE[3]=0+'0';
+          Serial.println("");
+          Serial.println(msgE);
+      }  
 }
 
 
@@ -132,4 +314,3 @@ void parada() {
 void marxa() {
   
 }
- 
