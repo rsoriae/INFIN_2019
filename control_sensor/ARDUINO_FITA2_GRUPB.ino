@@ -6,7 +6,6 @@ float mytemp[10];
 int i=0;
 int parat=1;
 String data;
-//String data1;
 int tempsd;
 int tempsu;
 int tempsentre;
@@ -17,7 +16,7 @@ int entradau;
 int entradad;
 int entrada;
 int valorentrada;
-//respostes
+///////respostes///////
 String msgM="AMEZ";
 String msgC="ACE0000Z";
 String msgS="ASEZ";
@@ -94,6 +93,14 @@ void adquisicio() {
             int value = analogRead(Pinsensor);
             float millivolts = (value / 1023.0) * 5000; //conversió de milivolsts a celsius
             //ARDUINO 1 ES DE 10 BITS, PER TANT ELS VALORS VAN DE 0 1024 I 5000 PERQUE TENIM LECTURES DE 0 5v
+
+             //construcció del missatge
+            msgC[2]=0+'0';
+            msgC[3]=((value-(value%1000))/1000)+'0';
+            msgC[4]=(((value%1000)-(value%100))/100)+'0';
+            msgC[5]=(((value%100)-(value%10))/10)+'0';
+            msgC[6]=((value%10))+'0';
+            
             
             float celsius = millivolts / 10; 
             Serial.print(celsius);
@@ -132,7 +139,7 @@ void parada() {
         if((temps <= 20)&&(temps > 0)){
           
           //Igualació per evitar mostrar continuament el missatge introduït
-          //data1=data;
+         
           
           //Canvi de número a caràcter ASCII, sumant 48 (valor 0 en ASCII)
           msgM[2]=0+'0';
@@ -151,7 +158,7 @@ void parada() {
           opcio=1;
         }
 
-         else{
+         else {
            
         //en cas contrari, s'envia un 2, error de paràmetres
           msgM[2]=2+'0';
@@ -159,6 +166,18 @@ void parada() {
           Serial.println(msgM);
          }
       }
+
+       else if ((data[0]=='A')&&(data[1]=='M')&&(data[2]=='0')&&(data[5]=='Z')){
+           
+        //en cas contrari, s'envia un 2, error de paràmetres
+          msgM[2]=2+'0';
+          Serial.println("");
+          Serial.println(msgM);
+                 
+
+         }
+
+      
 
       //Comprovació d'error de protocol
       if((data[0]=='A') && (data[1]=='M') && (data[5]!='Z')){
@@ -180,6 +199,16 @@ void parada() {
           Serial.println(msgC);
       }
 
+      else if ((data[0]=='A') && (data[1]=='C') && (data[2]=='Z')){
+         
+          //Mostrar per pantalla error de protocol
+          msgC[2]=2+'0';
+                    
+          Serial.println("");
+          Serial.println(msgC);
+      
+      
+      }
 
       //Comprovació comanda Sortida digital
       if((data[0]=='A') && (data[1]=='S') && (data[5]=='Z')){
@@ -290,9 +319,10 @@ void parada() {
      
         //comprovació comanda CONVERTIDOR  
         if((data[0]=='A') && (data[1]=='C') && (data[2]=='Z')){
-
-          //data=data1;
-      
+          
+          
+            //Mostra per pantalla el valor de la mitjana           
+            Serial.println(msgC); 
                   
         }
         //Error de protocol CONVERTIDOR
@@ -379,7 +409,6 @@ void parada() {
         
         //Error de paràmetres
         if(entrada > 13){
-
           msgE[2]=2+'0';
           msgE[3]=0+'0';
           Serial.println("");
@@ -422,7 +451,6 @@ void parada() {
       
               if((temps <= 20)&&(temps > 0)){
          
-                 // data1=data;
                   msgM[2]=0+'0';
         
                   Serial.println("");
@@ -460,8 +488,16 @@ void loop()
       
       if(parat == 1){
         
-        Serial.println("");
-        Serial.println("PARAT");
+        
+         msgM[2]=0+'0';
+        
+                  Serial.println("");
+                  Serial.println(data);
+                  Serial.println("");
+                  Serial.println(msgM);
+                              
+                  Serial.println("");
+                  Serial.println("PARAT");
         parat=0;
       }
       parada();
