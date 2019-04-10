@@ -6,8 +6,7 @@ float mytemp[10];
 int i=0;
 int parat=1;
 String data;
-String data1;
-int mostres;
+//String data1;
 int tempsd;
 int tempsu;
 int tempsentre;
@@ -18,10 +17,6 @@ int entradau;
 int entradad;
 int entrada;
 int valorentrada;
-
-
-
-
 //respostes
 String msgM="AMEZ";
 String msgC="ACE0000Z";
@@ -55,7 +50,7 @@ void setup()
   
   
 /////////////INTERRUPCIONS///////////////  
-   //Desactivar totes les interrupcions  
+  
    noInterrupts();
    TCCR1A = 0;
    TCCR1B = 0;
@@ -77,37 +72,15 @@ ISR(TIMER1_COMPA_vect) // timer compare interrupt service
 ////////////////////////////////////////////
 
 
-void loop()
-{
-   
-  switch (opcio) {
-    
-    //Case de parada
-     case 0:
-      
-      if(parat == 1){
-        
-        Serial.println("");
-        Serial.println("PARAT");
-        parat=0;
-      }
-      parada();
-      break;
-      
-      
-    //Case de marxa i cridada de la funció marxa
-    case 1:
-     
-      
-      marxa();
-      break;   
-  }
-}
+
 
 
 
 // VOID QUE PREN LES DADES
 void adquisicio() {
+
+
+     
       //Si es troba en marxa, executará aquest if
       if(opcio == 1){
         
@@ -116,27 +89,18 @@ void adquisicio() {
         //Comparació del comptador amb el temps determinat per codi de l'adquisició
         
         if(comptador == temps){
-
+             
             //Llegirà el valor de l'entrada analògica (A0) i la mostra per pantalla
             int value = analogRead(Pinsensor);
             float millivolts = (value / 1023.0) * 5000; //conversió de milivolsts a celsius
+            //ARDUINO 1 ES DE 10 BITS, PER TANT ELS VALORS VAN DE 0 1024 I 5000 PERQUE TENIM LECTURES DE 0 5v
+            
             float celsius = millivolts / 10; 
             Serial.print(celsius);
             Serial.println(" ºC");
+            comptador = 0;
             
-            //Crea l'array de valors de temperatura per poder fer la mitjana
-            
-            mytemp[i]=celsius;
-            i++;
-            comptador=0;
-            
-            //Funció per fer l'array en bucle, amb un màxim de 9 mostres enmmagatzemades
-            
-            if(i == 9){
-  
-              i=0;          
-            }
-        }
+         }
     }
 }
 
@@ -144,25 +108,31 @@ void adquisicio() {
 // VOID QUE S'EXECUTA SI ESTEM EN EL CAS 0 DE PARADA
 void parada() {
 
+
+     //Recollida del valor introduit
+     data = Serial.readStringUntil('\n');
+
+
       //comprovació de la funció Marxa
-      if((data[0]=='A')&&(data[1]=='M')&&(data[2]=='1')&&(data[6]=='Z')){
+      
+      if((data[0]=='A')&&(data[1]=='M')&&(data[2]=='1')&&(data[5]=='Z')){
         
-        //concersió del número de string (ASCII) a enter
+        //conversió del número de string (ASCII) a enter
         tempsd=data[3]-48;
         tempsu=data[4]-48;
         
         //conversió a número enter de 2 dígits
         temps=tempsd*10+tempsu; 
-        mostres=data[5]-48;
+      
         
         //temps entre mostres en segon
         tempsentre=temps*1000;
 
         //Comprovació del si el temps supera els 20 segons o les mostres són superiors a 9
-        if((temps <= 20)&&(temps > 0)&&(mostres <= 9)&&(mostres > 0)){
+        if((temps <= 20)&&(temps > 0)){
           
-         //Igualació per evitar mostrar continuament el missatge introduït
-          data1=data;
+          //Igualació per evitar mostrar continuament el missatge introduït
+          //data1=data;
           
           //Canvi de número a caràcter ASCII, sumant 48 (valor 0 en ASCII)
           msgM[2]=0+'0';
@@ -175,8 +145,6 @@ void parada() {
           Serial.println("");
           Serial.print("TEMPS: ");
           Serial.println(temps);
-          Serial.print("MOSTRES: ");
-          Serial.println(mostres);
           Serial.println("");
           
           //es manté en situació marxa
@@ -193,7 +161,7 @@ void parada() {
       }
 
       //Comprovació d'error de protocol
-      if((data[0]=='A') && (data[1]=='M') && (data[6]!='Z')){
+      if((data[0]=='A') && (data[1]=='M') && (data[5]!='Z')){
      
           msgM[2]=1+'0';
           Serial.println("");
@@ -309,8 +277,202 @@ void parada() {
       }  
 }
 
-
+////////////////////////////////////////////////////////////////////////////////////////
 // VOID QUE S'EXECUTA SI ESTEM EN EL CAS 1 DE MARXA
-void marxa() {
+  void marxa() {
+    
+  if (Serial.available())
+   {
+        //Valor introduit per consola    
+        data = Serial.readStringUntil('\n');
+
+          
+     
+        //comprovació comanda CONVERTIDOR  
+        if((data[0]=='A') && (data[1]=='C') && (data[2]=='Z')){
+
+          //data=data1;
+      
+                  
+        }
+        //Error de protocol CONVERTIDOR
+        if((data[0]=='A') && (data[1]=='C') && (data[2]!='Z')){
+          
+          msgC[2]=1+'0';
+          
+          Serial.println("");
+          Serial.println(msgC);
+      }
+        //Comprovació codi sortida
+        if((data[0]=='A') && (data[1]=='S') && (data[5]=='Z')){
+
+        Serial.println("");
+        Serial.println(data);
+        
+        sortidad=data[2]-48;
+        sortidau=data[3]-48;
+        sortida=sortidad*10+sortidau;
+        
+        //Comprovació Rang sortides arduino
+        if((sortida <= 13) && ((data[4]=='1')||(data[4]=='0'))){
+        
+            if(data[4]=='1'){
+    
+              pinMode(sortida,OUTPUT);
+              digitalWrite(sortida,HIGH);
+              
+              msgS[2]=0+'0';
+              Serial.println("");
+              Serial.println(msgS);
+            }
+            if(data[4]=='0'){
+    
+              pinMode(sortida,OUTPUT);
+              digitalWrite(sortida,LOW);
+    
+              msgS[2]=0+'0';
+              Serial.println("");
+              Serial.println(msgS);
+            }           
+          }
+          else{
+            //Error de paràmetres
+            msgS[2]=2+'0';
+            Serial.println("");
+            Serial.println(msgS);
+          }
+          
+      }
+      //Error de protocol
+      if((data[0]=='A') && (data[1]=='S') && (data[5]!='Z')){
+
+          
+          msgS[2]=1+'0';
+         
+          Serial.println("");
+          Serial.println(msgS);
+      }
+    
+      //Comprovació d'entrades
+      if((data[0]=='A') && (data[1]=='E') && (data[4]=='Z')){
+        
+        Serial.println("");
+        Serial.println(data);
+        
+        entradad=data[2]-48;
+        entradau=data[3]-48;
+        entrada=entradad*10+entradau;
+
+       //Comprovació rang d'entrades
+        if(entrada <= 13){
+          
+        pinMode(entrada,INPUT_PULLUP);
+        
+        valorentrada= digitalRead(entrada);
+        Serial.println("");
+        Serial.println(valorentrada);
+
+        msgE[3]=valorentrada+'0';
+        Serial.println("");
+        Serial.println(msgE);
+        }
+        
+        //Error de paràmetres
+        if(entrada > 13){
+
+          msgE[2]=2+'0';
+          msgE[3]=0+'0';
+          Serial.println("");
+          Serial.println(msgE);
+        }
+      }
+      //Error de protocol
+      if((data[0]=='A') && (data[1]=='E') && (data[4]!='Z')){
+
+          msgE[2]=1+'0';
+          msgE[3]=0+'0';
+          Serial.println("");
+          Serial.println(msgE);
+      }
+      
+      //Comprovació codi marxa i parada de l'adquisició
+     if((data[0] == 'A')&&(data[1]=='M')&&(data[2]=='0')&&(data[5]=='Z')){
+        
+       //Variable per al case parada
+          parat=1;
+          opcio=0;
+        }
+      //Error de paràmetres
+     if((data[0]=='A') && (data[1]=='M') && (data[5]!='Z')){
+
+          msgM[2]=1+'0';
+          Serial.println("");
+          Serial.println(msgM);
+
+     }
+
+        else{
+          //Nova adquisició de marxa
+           if((data[0]=='A')&&(data[1]=='M')&&(data[2]=='1')&&(data[5]=='Z')){
+
+              tempsd=data[3]-48;
+              tempsu=data[4]-48;
+              temps=tempsd*10+tempsu;
+              tempsentre=temps*1000;
+      
+              if((temps <= 20)&&(temps > 0)){
+         
+                 // data1=data;
+                  msgM[2]=0+'0';
+        
+                  Serial.println("");
+                  Serial.println(data);
+                  Serial.println("");
+                  Serial.println(msgM);
+                  Serial.println("");
+                  Serial.print("TEMPS: ");
+                  Serial.println(temps);
+                  opcio=1;
+                }
+
+              else{
+                //Error de protocol
+                msgM[2]=2+'0';
+                Serial.println("");
+                Serial.println(msgM);
+              }
+              
+           }
+           
+        }
+        
+      }
   
+   }
+
+void loop()
+{
+   
+  switch (opcio) {
+    
+    //Case de parada
+     case 0:
+      
+      if(parat == 1){
+        
+        Serial.println("");
+        Serial.println("PARAT");
+        parat=0;
+      }
+      parada();
+      break;
+      
+      
+    //Case de marxa i cridada de la funció marxa
+    case 1:
+     
+      
+      marxa();
+      break;   
+  }
 }
